@@ -12,12 +12,12 @@ agnostic_nms = False
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-# MODEL_PATH = 'model/crosswalk_best.pt'
-MODEL_PATH = 'model/crosswalk_last.pt'
+MODEL_PATH = 'model/best.pt'
 model = YOLO(MODEL_PATH)
 
 # Open the video file
-video_path = "datasets/sample.mp4"
+# video_path = "datasets/sample.mp4"
+video_path = "datasets/full3.mp4"
 cap = cv2.VideoCapture(video_path)
 
 # Loop through the video frames
@@ -27,13 +27,22 @@ while cap.isOpened():
 
     if success:
         # Run YOLO inference on the frame
-        results = model(frame)
+        results = model(frame, stream=True)
 
-        # Visualize the results on the frame
-        annotated_frame = results[0].plot()
+        for result in results:
+            boxes = result.boxes  # Boxes object for bounding box outputs
+            # masks = result.masks  # Masks object for segmentation masks outputs
+            # keypoints = result.keypoints  # Keypoints object for pose outputs
+            # probs = result.probs  # Probs object for classification outputs
+            # obb = result.obb  # Oriented boxes object for OBB outputs
+            # result.show()  # display to screen
+            # result.save(filename="result.jpg")  # save to disk
+
+            # Visualize the results on the frame
+            frame = result.plot()
 
         # Display the annotated frame
-        cv2.imshow("YOLO Inference", annotated_frame)
+        cv2.imshow("YOLO Inference", frame)
 
         # Break the loop if 'q' is pressed
         if cv2.waitKey(60) & 0xFF == ord("q"):
